@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"> <!-- Habilitamos el uso de Thymeleaf en esta vista -->
+<!-- En Thymeleaf,'@' se usa para especificar rutas o urls,y '$' se usa para acceder al contenido de alguna variable o instancia que le pasamos desde algún controlador -->
+
+<head>
+<meta charset="UTF-8">
+<title th:text="${titulo}"></title> <!-- Con th:text mostramos el valor del atributo 'titulo' definido en el controlador asociado a esta vista('ProductoController'->método handler 'listar') -->
+</head>
+<body>
+<h1 th:text="${titulo}"></h1> <!-- Con th:text mostramos el valor del atributo 'titulo' definido en el controlador asociado a esta vista('ProductoController'->método handler 'listar') -->
+<!-- Div que contiene el formulario de creación de productos -->
+<div>
+	<!-- Con th:href de Thymeleaf y '@{}' creamos un enlace para ir a la ruta '/listar' -->
+	<a th:href="@{/listar}">volver</a>
+	<!-- Cuando hagamos un submit del formulario,nos vamos a ir a la ruta indicada en el "action" con una petición http de tipo Post-->
+	<!-- Con th:object indicamos que vamos a usar el objeto "producto" del controlador en el formulario para almacenar los datos-->
+	<!-- El atributo 'enctype' con el valor 'multipart/form-data' es necesario para poder subir archivos al servidor a través de este formulario -->
+	<form th:action="@{/form}" method="post" th:object="${producto}"  enctype="multipart/form-data">
+		<!-- ------------------------------------------------------- -->
+		<!-- Una manera de mantener el id y la foto de un producto hasta que se finalice el proceso de edición en la base de datos mediante el método handler correspondiente del controlador -->
+		<!-- Creamos dos inputs ocultos(es oculto porque al usuario no le interesa ver el id del producto ni la foto del producto en este formulario) para poder pasar a esta vista el id y la foto del producto cuando exista desde el controlador,y de esta manera,poder utilizarlo para que funcione correctamente la edición de un producto -->
+		<!-- Como este formulario se usa tanto para la creación de un producto como para su edición,cuando estamos en la creación de un nuevo producto,su id aún no existe,pero cuando estamos en la edición de un producto,sí que existe.Entonces,solo queremos usar este input para la edición de un producto,y por lo tanto,tenemos que verificar antes que el id de ese producto existe.Esto lo hacemos usando th:if de Thymeleaf -->
+		<!-- Con * y th:field pasamos el id del objeto "producto" a este input -->
+		<!-- <input th:if="${producto.id} != null" type="hidden" th:field="*{id}"/> -->
+		<!-- <input th:if="${producto.foto} != null" type="hidden" th:field="*{foto}"/> -->
+		<!-- Otra manera es usar la anotación @SessionAttributes en el controlador -->
+		<!-- ---------------------------------------------------------------------------- -->
+		<!-- Con * y th:field mapeamos los datos que introduzca el usuario en la propiedad "nombre" del objecto "producto" -->
+		<div>
+			<label for="nombre">Nombre</label>
+			<div><input type="text" th:field="*{nombre}"/></div>
+			<!-- Con th:if comprobamos si hay errores de validación para la propiedad 'nombre' de la instancia 'producto' asociada a este formulario, y con th:errors, sobre la misma propiedad, nos da los mensajes de error a mostrar -->
+			<small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+		</div>
+		<!-- Con * y th:field mapeamos los datos que introduzca el usuario en la propiedad "precio" del objecto "producto" -->
+		<div>
+			<label for="precio">Precio</label>
+			<div><input type="number" th:field="*{precio}"/></div>
+			<!-- Con th:if comprobamos si hay errores de validación para la propiedad 'precio' de la instancia 'producto' asociada a este formulario, y con th:errors, sobre la misma propiedad, nos da los mensajes de error a mostrar -->
+			<small th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}"></small>
+		</div>
+		<!-- Con * y th:field mapeamos los datos que introduzca el usuario en la propiedad "createAt" del objecto "producto" -->
+		<div>
+			<label for="createAt">Fecha</label>
+			<div><input type="date" th:field="*{createAt}"/></div>
+		</div>
+		<div>
+			<label for="categoria.id">Categoría</label>
+			<div>
+			<!-- Este select se trata de una lista desplegable con las categorías -->
+			<!-- Con * y th:field establecemos en este select o lista desplegable el valor de la propiedad 'id' de la instancia 'categoria' incluida en el atributo 'producto'  que se le pasa desde el controlador -->
+			<!-- Cuando la operación a realizar sea la creación de un nuevo producto,el id de la categoría va a ser nulo o vacío, porque aún no se ha guardado en la base de datos, y por lo tanto, el texto por defecto que se va a mostrar en este select va a ser "-- seleccionar --" -->
+			<!-- Sin embargo, cuando la operación sea la edición de un producto ya existente, el id de la categoría no será nulo o vacío y, entonces, el texto por defecto a mostrar en este select será el nombre correspondiente a dicha categoría -->
+			<select th:field="*{categoria.id}">
+				<!-- La primera opción(asociada a un valor nulo o vacío) de esta lista desplegable es un texto informativo para el usuario para que elija una categoría  -->
+				<option value="">-- seleccionar --</option>
+				<!-- El resto de las opciones son las categorías de la lista contenida en el atributo 'categorias' que se le pasa desde el controlador -->
+				<!-- Estas categorías se iteran usando th:each y, por cada una de ellas, se establece el valor de cada opción con el id de la categoria usando th:value y se fija el texto de cada opción con el nombre de cada categoría usando th:text -->
+				<option th:each="c: ${categorias}" th:value="${c.id}" th:text="${c.nombre}"></option>
+			</select>
+			</div>
+			<!-- Con th:if comprobamos si hay errores de validación para la propiedad 'id' de la instancia 'categoria' incluida en la instancia 'producto' asociada a este formulario, y con th:errors, sobre la misma propiedad, nos da los mensajes de error a mostrar -->
+			<small th:if="${#fields.hasErrors('categoria.id')}" th:errors="*{categoria.id}"></small>
+		</div>
+		<div>
+			<label for="file">Foto</label>
+			<!-- Para la subida de archivos,el tipo del input tiene que ser de tipo "file".El valor del atributo "name" puede ser cualquiera,es irrelevante -->
+			<div><input type="file" name="file"/></div>
+		</div>
+		
+		<!-- Con $ y th:value damos valor a este botón a partir del atributo "operacion" que se lo pasamos desde el controlador -->
+		<!-- Este elemento de tipo submit va a realizar una peticion http de tipo Post hacia ruta indicada en "action" -->
+		<div>
+			<div><input type="submit" th:value="${operacion}"/></div>
+		</div>
+	</form>
+</div>
+</body>
+</html>

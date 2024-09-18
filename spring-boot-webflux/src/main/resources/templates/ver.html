@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"> <!-- Habilitamos el uso de Thymeleaf en esta vista -->
+<!-- En Thymeleaf,'@' se usa para especificar rutas o urls,y '$' se usa para acceder al contenido de alguna variable o instancia que le pasamos desde algún controlador -->
+
+<head>
+<meta charset="UTF-8">
+<title th:text="${titulo}"></title> <!-- Con th:text mostramos el valor del atributo 'titulo' definido en el controlador asociado a esta vista('ProductoController'->método handler 'listar') -->
+</head>
+<body>
+
+<h1 th:text="${titulo}"></h1> <!-- Con th:text mostramos el valor del atributo 'titulo' definido en el controlador asociado a esta vista('ProductoController'->método handler 'listar') -->
+<!-- Con th:href de Thymeleaf y '@{}' creamos un enlace para ir a la ruta '/listar' -->
+<a th:href="@{/listar}">volver</a>
+
+<div>
+	<div>
+		<!-- Imagen del producto -->
+		<!-- Como la imagen de un producto es opcional, con th:if de Thymeleaf verificamos si el producto tiene una imagen asociada comprobando que el valor de la propiedad "foto" del atributo "producto" que se pasa a esta vista desde el controlador es distinto a null y su longitud es mayor a 0. Para obtener la longitud, usamos el método "length" del helper de Thymeleaf "strings" -->
+		<!-- Con th:src de Thymeleaf y el caracter '@' indicamos la url que escucha el método handler correspondiente del controlador que se encarga de recuperar y devolver la imagen del directorio de subidas. Para ello, concatenamos a la url el nombre único de la imagen del producto accediendo a la propiedad "foto" del atributo "producto" -->
+		<!-- Con th:alt de Thymeleaf establecemos el nombre del producto accediendo a la propiedad "name" del atributo "producto". Entonces, en caso de que no se pueda recuperar la imagen del directorio de subidas, se mostrará en la vista el nombre del producto -->
+		<img th:if="${producto.foto != null && #strings.length(producto.foto) > 0}"
+			 style="max-width: 25%"
+			 th:src="@{/uploads/img/} + ${producto.foto}" th:alt="${producto.nombre}"/>
+	</div>
+	<!-- Lista desordenada con los datos del producto -->
+	<ul>
+		<!-- Con th:text mostramos el texto 'Id: ' seguido del contenido de la propiedad 'id' del atributo 'producto' que se pasa a esta vista desde el controlador -->
+		<li th:text="'Id: ' + ${producto.id}"></li>
+		<!-- Con th:text mostramos el texto 'Nombre: ' seguido del contenido de la propiedad 'nombre' del atributo 'producto' que se pasa a esta vista desde el controlador -->
+		<li th:text="'Nombre: ' + ${producto.nombre}"></li>
+		<!-- Con th:text mostramos el texto 'Precio: ' seguido del contenido de la propiedad 'precio' del atributo 'producto' que se pasa a esta vista desde el controlador -->
+		<li th:text="'Precio: ' + ${#numbers.formatCurrency(producto.precio)}"></li> <!-- Usamos el helper de Thymeleaf "numbers" para dar formato al precio del producto. Para ello, usamos el método "formatCurrency" de dicho helper para dar formato al precio con el tipo de moneda correspondiente al locale configurado en el navegador -->
+		<!-- Con th:text mostramos el texto 'Fecha: ' seguido del contenido de la propiedad 'createAt' del atributo 'producto' que se pasa a esta vista desde el controlador -->
+		<li th:text="'Fecha: ' + ${#calendars.format(producto.createAt,'dd/MM/yyyy')}"></li> <!-- Usamos el helper de Thymeleaf "calendars" paradar formato a la fecha de creación del producto. Para ello, usamos el método "format" de dicho helper para dar el formato "dd/MM/yyyy" a la fecha -->
+	</ul>
+</div>
+
+</body>
+</html>

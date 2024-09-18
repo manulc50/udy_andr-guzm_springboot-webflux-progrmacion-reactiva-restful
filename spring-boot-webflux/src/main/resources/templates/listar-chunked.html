@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"> <!-- Habilitamos el uso de Thymeleaf en esta vista -->
+<!-- En Thymeleaf,'@' se usa para especificar rutas o urls,y '$' se usa para acceder al contenido de alguna variable o instancia que le pasamos desde algún controlador -->
+
+<head>
+<meta charset="UTF-8">
+<title th:text="${titulo}"></title> <!-- Con th:text mostramos el valor del atributo 'titulo' definido en el controlador asociado a esta vista('ProductoController'->método handler 'listar') -->
+</head>
+<body>
+<h1 th:text="${titulo}"></h1> <!-- Con th:text mostramos el valor del atributo 'titulo' definido en el controlador asociado a esta vista('ProductoController'->método handler 'listar') -->
+<!-- Creamos una tabla con los datos de los productos -->
+<table>
+	<thead>
+		<tr>
+			<th>id</th>
+			<th>nombre</th>
+			<th>precio</th>
+			<th>fecha</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr th:each="producto: ${productos}"> <!-- Con th:each iteramos la lista de productos 'productos'(atributo definido en el controlador asociado a esta vista: 'ProductoController'-> método handler 'listar') y creamos la estructura HTML 'tr' junto con sus 'td' tantas veces como número de elementos haya en dicho listado -->
+			<td th:text="${producto.id}"></td> <!-- Con th:text mostramos el contenido de la propiedad 'id' contenida en la instancia 'producto' obtenida del listado 'productos' -->
+			<td th:text="${producto.nombre}"></td> <!-- Con th:text mostramos el contenido de la propiedad 'nombre' contenida en la instancia 'producto' obtenida del listado 'productos' -->
+			<td th:text="${producto.precio}"></td> <!-- Con th:text mostramos el contenido de la propiedad 'precio' contenida en la instancia 'producto' obtenida del listado 'productos' -->
+			<td th:text="${producto.createAt}"></td> <!-- Con th:text mostramos el contenido de la propiedad 'createAt' contenida en la instancia 'producto' obtenida del listado 'productos' -->
+		</tr>
+	</tbody>
+</table>
+</body>
+</html>

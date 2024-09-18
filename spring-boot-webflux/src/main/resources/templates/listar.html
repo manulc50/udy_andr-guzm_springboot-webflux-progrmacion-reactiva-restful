@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"> <!-- Habilitamos el uso de Thymeleaf en esta vista -->
+<!-- En Thymeleaf,'@' se usa para especificar rutas o urls,y '$' se usa para acceder al contenido de alguna variable o instancia que le pasamos desde algún controlador -->
+
+<head>
+<meta charset="UTF-8">
+<title th:text="${titulo}"></title> <!-- Con th:text mostramos el valor del atributo 'titulo' definido en el controlador asociado a esta vista('ProductoController'->método handler 'listar') -->
+</head>
+<body>
+
+<!-- Con th:if,si en la url o path viene definido el parámetro "error",mostramos,usando th:text, el div con el valor de dicho parámetro -->
+<div th:if="${param.error} != null" th:text="${param.error}"></div>
+<!-- Con th:if,si en la url o path viene definido el parámetro "success",mostramos,usando th:text, el div con el valor de dicho parámetro -->
+<div th:if="${param.success} != null" th:text="${param.success}"></div>
+
+<h1 th:text="${titulo}"></h1> <!-- Con th:text mostramos el valor del atributo 'titulo' definido en el controlador asociado a esta vista('ProductoController'->método handler 'listar') -->
+<!-- Con th:href de Thymeleaf y '@{}' creamos un enlace para ir a la ruta '/form' -->
+<a th:href="@{/form}">crear +</a>
+<!-- Creamos una tabla con los datos de los productos -->
+<table>
+	<thead>
+		<tr>
+			<th>id</th>
+			<th>nombre</th>
+			<th>precio</th>
+			<th>fecha</th>
+			<th>categoria</th>
+			<th>editar</th>
+			<th>eliminar</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr th:each="producto: ${productos}"> <!-- Con th:each iteramos la lista de productos 'productos'(atributo definido en el controlador asociado a esta vista: 'ProductoController'-> método handler 'listar') y creamos la estructura HTML 'tr' junto con sus 'td' tantas veces como número de elementos haya en dicho listado -->
+			<!-- Con th:href nos vamor al path o url "/ver/" + id_producto y con th:text mostramos el contenido de la propiedad 'id' contenida en la instancia 'producto' obtenida del listado 'productos' -->
+			<td><a th:href="@{/ver/} + ${producto.id}" th:text="${#strings.abbreviate(producto.id,10)}"></a></td> <!-- Usamos el helper de Thymeleaf "strings" para dar formato y acortar el id del producto porque los ids de los productos son muy largos. Para ello, usamos el método "abbreviate" de dicho helper de Thymeleaf para obtener los 10 primeros caracteres del id -->
+			<td th:text="${producto.nombre}"></td> <!-- Con th:text mostramos el contenido de la propiedad 'nombre' contenida en la instancia 'producto' obtenida del listado 'productos' -->
+			<!-- Con th:text mostramos el contenido de la propiedad 'precio' contenida en la instancia 'producto' obtenida del listado 'productos' -->
+			<td th:text="${#numbers.formatCurrency(producto.precio)}"></td> <!-- Usamos el helper de Thymeleaf "numbers" para dar formato al precio del producto. Para ello, usamos el método "formatCurrency" de dicho helper para dar formato al precio con el tipo de moneda correspondiente al locale configurado en el navegador -->
+			<!-- Con th:text mostramos el contenido de la propiedad 'createAt' contenida en la instancia 'producto' obtenida del listado 'productos' -->
+			<td th:text="${#calendars.format(producto.createAt,'dd/MM/yyyy')}"></td> <!-- Usamos el helper de Thymeleaf "calendars" paradar formato a la fecha de creación del producto. Para ello, usamos el método "format" de dicho helper para dar el formato "dd/MM/yyyy" a la fecha -->
+			<td th:text="${producto.categoria.nombre}"></td> <!-- Con th:text mostramos el contenido de la propiedad 'nombre' contenida en la instancia 'categoria' que pertenece a la instancia 'producto' obtenida del listado 'productos' -->
+			<td><a th:href="@{/form/} + ${producto.id}">editar</a></td> <!-- Con th:href de Thymeleaf y '@{}' creamos un enlace para ir a la ruta '/form/' + id_producto -->
+			<!-- <td><a th:href="@{/form-v2/} + ${producto.id}">editar</a></td> --> <!-- Con th:href de Thymeleaf y '@{}' creamos un enlace para ir a la ruta '/form-v2/' + id_producto -->
+			<!-- Con th:href de Thymeleaf y '@{}' creamos un enlace para ir a la ruta '/eliminar/' + id_producto -->
+			<td><a th:href="@{/eliminar/} + ${producto.id}" onclick="return confirm('Estás seguro que deseas eliminar?')">eliminar</a></td> <!-- Al evento OnClick de este enlace le asociamos la ejecución de la función de Javascript "confirm" para que muestre al usuario una ventana de confirmación con el texto "Estás seguro que deseas eliminar?" antes de proceder a la eliminación del producto -->
+		</tr>
+	</tbody>
+</table>
+</body>
+</html>
